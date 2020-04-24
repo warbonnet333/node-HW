@@ -1,27 +1,19 @@
-const argv = require('yargs').argv
-const contactsFunc = require('./contacts.js')
+const express = require("express")
+const cors = require("cors")
+const morgan = require('morgan')
 
-function invokeAction({ action, id, name, email, phone }) {
-    switch (action) {
-        case 'list':
-            contactsFunc.listContacts()
-            break;
+const contactsRoute = require('./routes/contacts.routes')
 
-        case 'get':
-            contactsFunc.getContactById(id)
-            break;
+require('dotenv').config()
 
-        case 'add':
-            contactsFunc.addContact(name, email, phone)
-            break;
+const app = express()
 
-        case 'remove':
-            contactsFunc.removeContact(id)
-            break;
+app.use(cors())
+app.use(express.json())
+app.use(morgan('combined'))
 
-        default:
-            console.warn('\x1B[31m Unknown action type!');
-    }
-}
+app.use("/contacts", contactsRoute)
 
-invokeAction(argv);
+app.listen(process.env.PORT, () => {
+    console.log("Starting server on port ", process.env.PORT)
+})
