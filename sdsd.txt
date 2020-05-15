@@ -1,0 +1,18 @@
+// admin_03
+// gEdBZNYMaBSWXzTr
+mongodb+srv://admin_03:gEdBZNYMaBSWXzTr@cluster0-yhuge.gcp.mongodb.net/test?retryWrites=true&w=majority
+
+{"_id":{"$oid":"5eb074232c30a1378dacdbda"},"name":"Allen Raymond","email":"nulla.ante@vestibul.co.uk","phone":"(992) 914-3792","subscription":"free","password":"password","token":""}
+
+
+WlaejmEUEMm0D34Y
+mongodb+srv://admin_03:WlaejmEUEMm0D34Y@cluster0-rjgwo.mongodb.net/test?retryWrites=true&w=majority
+
+
+    "token": "",
+    "_id": "5eb074232c30a1378dacdbda",
+    "name": "Allen Raymond",
+    "email": "nulla.ante@vestibul.co.uk",
+    "phone": "(992) 914-3792",
+    "subscription": "free",
+    "password": "password"
