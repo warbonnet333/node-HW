@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const mongoosePaginate = require("mongoose-paginate-v2");
 const { Schema } = mongoose;
 
 const contactSchema = new Schema({
@@ -26,6 +27,8 @@ async function updateToken(id, newToken) {
 
 contactSchema.statics.findContactByEmail = findContactByEmail;
 contactSchema.statics.updateToken = updateToken;
+
+contactSchema.plugin(mongoosePaginate);
 
 const contactModel = mongoose.model("contacts", contactSchema);
 

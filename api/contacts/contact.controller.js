@@ -26,8 +26,39 @@ class ContactsController {
 
   async _listContacts(req, res, next) {
     try {
-      const allContacts = await contactModel.find();
-      return res.status(200).send(this.prepareContacts(allContacts));
+      const { page, limit, sub } = req.query;
+
+      let options;
+
+      Object.keys(req.query).length
+        ? (options = {
+            page,
+            limit,
+          })
+        : (options = {
+            pagination: false,
+          });
+
+      // Якщо потрібно відсортувати без урахуваня пагінації
+
+      // Object.keys(req.query).length && !sub
+      //   ? (options = {
+      //       page,
+      //       limit,
+      //     })
+      //   : (options = {
+      //       pagination: false,
+      //     });
+
+      const paginRes = await contactModel.paginate({}, options);
+
+      const filteredContacts = paginRes.docs.filter(
+        (item) => item.subscription === sub
+      );
+
+      return res
+        .status(200)
+        .send(this.prepareContacts(sub ? filteredContacts : paginRes.docs));
     } catch (error) {
       next(error);
     }
