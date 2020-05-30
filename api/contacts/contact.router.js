@@ -3,13 +3,35 @@ const ContactsController = require("./contact.controller");
 
 const contactsRouter = express.Router();
 
-contactsRouter.post(
+contactsRouter.get(
   "/",
+  ContactsController.authorize,
+  ContactsController.listContacts
+);
+
+contactsRouter.post(
+  "/auth/register",
   ContactsController.validateCreateContact,
   ContactsController.addContact
 );
 
-contactsRouter.get("/", ContactsController.listContacts);
+contactsRouter.post(
+  "/auth/login",
+  ContactsController.validateLogInContact,
+  ContactsController.logIn
+);
+
+contactsRouter.post(
+  "/auth/logout",
+  ContactsController.authorize,
+  ContactsController.logOut
+);
+
+contactsRouter.get(
+  "/current",
+  ContactsController.authorize,
+  ContactsController.currentContact
+);
 
 contactsRouter.get("/:id", ContactsController.getContactById);
 
