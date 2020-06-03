@@ -26,6 +26,7 @@ module.exports = class ContactServer {
   initMiddlewares() {
     this.server.use(express.json());
     this.server.use(express.urlencoded({ extended: true }));
+    this.server.use(express.static("public"));
   }
 
   async initDatabase() {
