@@ -24,6 +24,10 @@ class ContactsController {
     return this._currentContact.bind(this);
   }
 
+  get changeAvatar() {
+    return this._changeAvatar.bind(this);
+  }
+
   async _listContacts(req, res, next) {
     try {
       const { page, limit, sub } = req.query;
@@ -202,6 +206,32 @@ class ContactsController {
     }
   }
 
+  async _changeAvatar(req, res, next) {
+    try {
+      const newAvatar = req.files[0];
+      const id = req.user._id;
+      const updatedContact = await contactModel.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            avatarURL: `http://localhost:${process.env.PORT}/images/${newAvatar.filename}`,
+          },
+        },
+        { new: true }
+      );
+
+      if (!updatedContact) {
+        return res.status(401).json({ message: "Not authorized" });
+      }
+
+      const [updatesAvatarContact] = this.prepareContacts([updatedContact]);
+
+      return res.status(200).send(updatesAvatarContact);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   validateUpdateContact(req, res, next) {
     const validationRules = Joi.object({
       name: Joi.string(),
@@ -253,7 +283,12 @@ class ContactsController {
 
   async authorize(req, res, next) {
     try {
+      console.log(req.headers.authorization)
       const authorizationHeader = req.get("Authorization");
+
+      if (!authorizationHeader)
+        return res.status(401).json({ message: "Not authorized" });
+
       const token = authorizationHeader.replace("Bearer ", "");
 
       let userId;
@@ -279,9 +314,9 @@ class ContactsController {
 
   prepareContacts(arr) {
     return arr.map((item) => {
-      const { id, name, email, phone, subscription } = item;
+      const { id, name, email, phone, subscription, avatarURL } = item;
 
-      return { id, name, email, phone, subscription };
+      return { id, name, email, phone, subscription, avatarURL };
     });
   }
 }

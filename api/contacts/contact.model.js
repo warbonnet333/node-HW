@@ -2,11 +2,18 @@ const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 const { Schema } = mongoose;
 
+require("dotenv").config();
+
 const contactSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
   password: { type: String, required: true },
+  avatarURL: {
+    type: String,
+    required: false,
+    default: `http://localhost:${process.env.PORT}/images/batman-icon.png`,
+  },
   subscription: {
     type: String,
     enum: ["free", "pro", "premium"],

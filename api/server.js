@@ -4,7 +4,7 @@ const contactsRoute = require("./contacts/contact.router");
 
 require("dotenv").config();
 
-const app = express();
+// const app = express();
 
 module.exports = class ContactServer {
   constructor() {
@@ -16,7 +16,7 @@ module.exports = class ContactServer {
     this.initMiddlewares();
     this.initRoutes();
     await this.initDatabase();
-    this.startListening();
+    return this.startListening();
   }
 
   initServer() {
@@ -26,6 +26,7 @@ module.exports = class ContactServer {
   initMiddlewares() {
     this.server.use(express.json());
     this.server.use(express.urlencoded({ extended: true }));
+    this.server.use(express.static("public"));
   }
 
   async initDatabase() {
@@ -41,7 +42,7 @@ module.exports = class ContactServer {
   }
 
   startListening() {
-    this.server.listen(process.env.PORT, () => {
+    return this.server.listen(process.env.PORT, () => {
       console.log("Database connection successful...", process.env.PORT);
     });
   }
