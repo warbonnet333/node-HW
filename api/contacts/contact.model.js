@@ -20,6 +20,16 @@ const contactSchema = new Schema({
     default: "free",
   },
   token: { type: String, required: false },
+  status: {
+    type: String,
+    required: true,
+    enum: ["Verified", "NotVerified"],
+    default: "NotVerified",
+  },
+  verificationToken: {
+    type: String,
+    required: false,
+  },
 });
 
 async function findContactByEmail(email) {
@@ -32,8 +42,40 @@ async function updateToken(id, newToken) {
   });
 }
 
+async function createVerToken(id, verificationToken) {
+  return this.findByIdAndUpdate(
+    id,
+    {
+      verificationToken,
+    },
+    {
+      new: true,
+    }
+  );
+}
+
+async function findByVerToken(verificationToken) {
+  return this.findOne({ verificationToken });
+}
+
+async function verifyUser(id) {
+  return this.findByIdAndUpdate(
+    id,
+    {
+      status: "Verified",
+      verificationToken: null,
+    },
+    {
+      new: true,
+    }
+  );
+}
+
 contactSchema.statics.findContactByEmail = findContactByEmail;
 contactSchema.statics.updateToken = updateToken;
+contactSchema.statics.createVerToken = createVerToken;
+contactSchema.statics.findByVerToken = findByVerToken;
+contactSchema.statics.verifyUser = verifyUser;
 
 contactSchema.plugin(mongoosePaginate);
 

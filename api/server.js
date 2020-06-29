@@ -33,7 +33,6 @@ module.exports = class ContactServer {
     try {
       await mongoose.connect(process.env.CONTACTS_URL);
     } catch (error) {
-      console.log(error);
       process.exit(1);
     }
   }
