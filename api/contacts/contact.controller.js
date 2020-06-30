@@ -2,10 +2,23 @@ const Joi = require("joi");
 const contactModel = require("./contact.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sgMail = require("@sendgrid/mail");
+const uuid = require("uuid");
+
+// require("dotenv").config;
 
 class ContactsController {
   constructor() {
     this._costFactor = 4;
+
+    // this.transport = nodemailer.createTransport({
+    //   service: "gmail",
+    //   auth: {
+    //     user: "warbonnet333@gmail.com",
+    //     pass: "Bananaisbad270",
+    //   },
+    // });
+    // this.meiler = sgMail;
   }
 
   get addContact() {
@@ -116,6 +129,9 @@ class ContactsController {
         subscription,
         password: passwordHash,
       });
+
+      await this.sendVerificationEmail(newContact);
+
       return res.status(201).json({
         user: {
           id: newContact._id,
@@ -165,7 +181,7 @@ class ContactsController {
       const { email, password } = req.body;
 
       const user = await contactModel.findContactByEmail(email);
-      if (!user) {
+      if (!user || user.status !== "Verified") {
         return res.status(404).send("Email or password is wrong");
       }
 
@@ -283,7 +299,7 @@ class ContactsController {
 
   async authorize(req, res, next) {
     try {
-      console.log(req.headers.authorization)
+      console.log(req.headers.authorization);
       const authorizationHeader = req.get("Authorization");
 
       if (!authorizationHeader)
@@ -318,6 +334,58 @@ class ContactsController {
 
       return { id, name, email, phone, subscription, avatarURL };
     });
+  }
+
+  async sendVerificationEmail(user) {
+    try {
+      const verToken = uuid.v4();
+
+      await contactModel.createVerToken(user._id, verToken);
+
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+      console.log(user.email);
+
+      const msg = {
+        to: user.email,
+        from: process.env.SENDGRID_MAIL_SENDER,
+        subject: "Verification your email",
+        // text: "and easy to do anywhere, even with Node.js",
+        html: `<a href='http://localhost:5005/contacts/verify/${verToken}'>Verify ME</a>`,
+      };
+
+      const mess = await sgMail.send(msg);
+      console.log(mess);
+
+      //   const resulr = await this.transport.sendMail({
+      //     from: "warbonnet333@gmail.com",
+      //     to: user.email,
+      //     subject: "Verification your email",
+      //     html: `<a href='http://localhost:5005/contacts/verify/${verToken}'>Verify ME</a>`,
+      //   });
+
+      //   console.log(resulr);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async checkVerification(req, res, next) {
+    try {
+      const { token } = req.params;
+
+      const contactToVerify = await contactModel.findByVerToken(token);
+
+      if (!contactToVerify) {
+        return res.status(404).send("Not found");
+      }
+
+      await contactModel.verifyUser(contactToVerify._id);
+
+      return res.status(200).send("Your contact is verified!!!");
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

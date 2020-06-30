@@ -21,6 +21,8 @@ contactsRouter.get(
   ContactsController.listContacts
 );
 
+contactsRouter.get("/verify/:token", ContactsController.checkVerification);
+
 contactsRouter.post(
   "/auth/register",
   ContactsController.validateCreateContact,
