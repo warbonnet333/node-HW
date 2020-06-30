@@ -4,23 +4,20 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sgMail = require("@sendgrid/mail");
 const uuid = require("uuid");
-const nodemailer = require("nodemailer");
 
 // require("dotenv").config;
-
-console.log(process.env.SENDGRID_API_KEY);
 
 class ContactsController {
   constructor() {
     this._costFactor = 4;
 
-    this.transport = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "warbonnet333@gmail.com",
-        pass: "Bananaisbad270",
-      },
-    });
+    // this.transport = nodemailer.createTransport({
+    //   service: "gmail",
+    //   auth: {
+    //     user: "warbonnet333@gmail.com",
+    //     pass: "Bananaisbad270",
+    //   },
+    // });
     // this.meiler = sgMail;
   }
 
@@ -347,6 +344,8 @@ class ContactsController {
 
       sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+      console.log(user.email);
+
       const msg = {
         to: user.email,
         from: "warbonnet333@gmail.com",
@@ -375,13 +374,13 @@ class ContactsController {
     try {
       const { token } = req.params;
 
-      const contactToVerify = await this.contactModel.findByVerToken(token);
+      const contactToVerify = await contactModel.findByVerToken(token);
 
       if (!contactToVerify) {
         return res.status(404).send("Not found");
       }
 
-      await this.contactModel.verifyUser(contactToVerify._id);
+      await contactModel.verifyUser(contactToVerify._id);
 
       return res.status(200).send("Your contact is verified!!!");
     } catch (error) {
