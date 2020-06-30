@@ -348,7 +348,7 @@ class ContactsController {
 
       const msg = {
         to: user.email,
-        from: "warbonnet333@gmail.com",
+        from: process.env.SENDGRID_MAIL_SENDER,
         subject: "Verification your email",
         // text: "and easy to do anywhere, even with Node.js",
         html: `<a href='http://localhost:5005/contacts/verify/${verToken}'>Verify ME</a>`,
